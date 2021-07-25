@@ -26,57 +26,47 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public User createUser(User user) {
+    public User createUser(User user) throws GlobalException {
         LOGGER.info("Creating user with details :- " + user);
         Optional<User> existingUser = userRepository.findUserByEmail(user.getEmail());
         if (existingUser.isPresent()) {
             LOGGER.debug(String.format("User already exists with email id %s ", user.getEmail()));
-            return null;
+            throw new GlobalException("User already exits.Can not create.");
         }
         return userRepository.saveAndFlush(user);
     }
 
-    public User findUserById(@NotNull final long userId) {
-        User user = userRepository.findById(userId).orElse(null);
-        if (null != user) {
-            user.getPosts().clear();
-            user.getFollowing().clear();
-        }
+    public User findUserById(@NotNull final long userId) throws UserNotFoundException {
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User does not exist."));
+        user.getPosts().clear();
+        user.getFollowing().clear();
         return user;
     }
 
     public void followUser(long followerId, long followeeId) throws GlobalException  {
-        User follower = userRepository.findById(followerId).orElse(null);
-        User followee = userRepository.findById(followeeId).orElse(null);
-        if (null != follower && null != followee){
+        User follower = userRepository.findById(followerId).orElseThrow(() -> new UserNotFoundException("User does not exist."));
+        User followee = userRepository.findById(followeeId).orElseThrow(() -> new UserNotFoundException("User does not exist."));
             if (!follower.getFollowing().contains(followee)) {
                 follower.getFollowing().add(followee);
                 userRepository.saveAndFlush(follower);
             }else {
                 throw new GlobalException("User already follows this user.");
             }
-        } else {
-            throw new UserNotFoundException("User unknown");
-        }
     }
 
     public void unFollowUser(long followerId, long followeeId) throws GlobalException {
-        User follower = userRepository.findById(followerId).orElse(null);
-        User followee = userRepository.findById(followeeId).orElse(null);
-        if (null != follower && null != followee){
-            if (follower.getFollowing().contains(followee)) {
-                follower.getFollowing().remove(followee);
-                userRepository.saveAndFlush(follower);
-            }else {
-                throw new GlobalException("User does not follow this user.");
-            }
-        } else {
-            throw new UserNotFoundException("User unknown");
+        User follower = userRepository.findById(followerId).orElseThrow(() -> new UserNotFoundException("User does not exist."));
+        User followee = userRepository.findById(followeeId).orElseThrow(() -> new UserNotFoundException("User does not exist."));
+        if (follower.getFollowing().contains(followee)) {
+            follower.getFollowing().remove(followee);
+            userRepository.saveAndFlush(follower);
+        }else {
+            throw new GlobalException("User does not follow this user.");
         }
     }
 
-    public List<User> findFollowers(long userId) throws Exception {
-        User user = userRepository.findById(userId).orElseThrow(() -> new Exception("User not found"));
+    public List<User> findFollowers(long userId) throws UserNotFoundException {
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User does not exist."));
         user.getPosts().clear();
         return user.getFollowing().stream().map(follower -> {
             follower.getFollowing().clear();

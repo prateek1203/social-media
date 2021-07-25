@@ -26,14 +26,18 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.catchThrowable;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 @SpringBootTest
 @RunWith(MockitoJUnitRunner.class)
 public class UserControllerTest {
-    @Mock private UserService mockUserService;
-    @Mock private PostService mockPostService;
-    @Mock private User mockUser;
+    @Mock
+    private UserService mockUserService;
+    @Mock
+    private PostService mockPostService;
+    @Mock
+    private User mockUser;
 
     private long randomId;
     private long followerId;

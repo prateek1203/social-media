@@ -31,7 +31,7 @@ public class UserController {
     }
 
     @PostMapping(produces = "application/json")
-    public ResponseEntity<User> createUser(@RequestBody final User user) {
+    public ResponseEntity<User> createUser(@RequestBody final User user) throws GlobalException {
         LOGGER.info(">>>>>> Creating User >>>>>>>>");
         User newUser = userService.createUser(user);
         if (null == newUser) {
@@ -88,11 +88,7 @@ public class UserController {
 
     @GetMapping(value = "{userId}/followers", produces = "application/json")
     public ResponseEntity<List<User>> getFollowers(@PathVariable long userId) {
-        try {
-            List<User> users = userService.findFollowers(userId);
-            return new ResponseEntity<>(users, HttpStatus.OK);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+        List<User> users = userService.findFollowers(userId);
+        return new ResponseEntity<>(users, HttpStatus.OK);
     }
 }

@@ -1,6 +1,8 @@
 package com.example.socialmedia.service;
 
 import com.example.socialmedia.domain.User;
+import com.example.socialmedia.exception.GlobalException;
+import com.example.socialmedia.exception.UserNotFoundException;
 import com.example.socialmedia.repository.UserRepository;
 import org.junit.Assert;
 import org.junit.Before;
@@ -41,8 +43,8 @@ public class UserServiceTest {
         Assert.assertEquals(mockUser, actualUser);
     }
 
-    @Test
-    public void shouldNotCreateUserIfUserAlreadyExist() {
+    @Test(expected = GlobalException.class)
+    public void shouldNotCreateUserIfUserAlreadyExist() throws GlobalException {
         User user = new User("mockFirstName", "mockLatName", "mockEmail");
         when(mockUserRepository.findUserByEmail(user.getEmail())).thenReturn(Optional.of(user));
         User actualUser = unit.createUser(user);
@@ -58,8 +60,8 @@ public class UserServiceTest {
         Assert.assertEquals(mockUser, actualUser);
     }
 
-    @Test
-    public void shouldDelegateNullIfUserDoesNotExist() {
+    @Test(expected = UserNotFoundException.class)
+    public void shouldDelegateNullIfUserDoesNotExist() throws UserNotFoundException {
         User user = new User("mockFirstName", "mockLatName", "mockEmail@mock.com");
         user.setId(1L);
         when(mockUserRepository.findById(user.getId())).thenReturn(Optional.empty());
@@ -80,6 +82,6 @@ public class UserServiceTest {
         when(mockUserRepository.findById(randomFollowerId)).thenReturn(Optional.empty());
         when(mockUserRepository.findById(randomFolloweeId)).thenReturn(Optional.of(mockUser));
         unit.followUser(randomFollowerId, randomFolloweeId);
-        Assert.assertEquals(mockUserRepository.findById(randomFollowerId).get().getFollowing().size(),0);
+        Assert.assertEquals(mockUserRepository.findById(randomFollowerId).get().getFollowing().size(), 0);
     }
 }

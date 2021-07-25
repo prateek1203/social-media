@@ -30,13 +30,9 @@ public class PostService {
     @Transactional
     public Post createPost(long userId, final Post post) throws UserNotFoundException {
         LOGGER.info("creating post for user: " + userId);
-        User user = userRepository.findById(userId).orElse(null);
-        if (null != user){
-            post.setUser(user);
-            return postRepository.save(post);
-        } else {
-            throw new UserNotFoundException("User does not exist. Post can not be created");
-        }
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User does not exist. Post can not be created"));
+        post.setUser(user);
+        return postRepository.save(post);
     }
 
     public List<Post> getNewsFeedForUser(long userId) {
