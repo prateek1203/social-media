@@ -54,12 +54,15 @@ public class UserService {
         }
     }
 
-    public void unFollowUser(long followerId, long followeeId) throws Exception {
-        User follower = userRepository.findById(followerId).orElseThrow(() -> new Exception("User not found"));
-        User followee = userRepository.findById(followeeId).orElseThrow(() -> new Exception("User not found"));
-
-        follower.getFollowing().remove(followee);
-        userRepository.saveAndFlush(follower);
+    public void unFollowUser(long followerId, long followeeId) {
+        User follower = userRepository.findById(followerId).orElse(null);
+        User followee = userRepository.findById(followeeId).orElse(null);
+        if (null != follower && null != followee){
+            if (follower.getFollowing().contains(followee)) {
+                follower.getFollowing().remove(followee);
+                userRepository.saveAndFlush(follower);
+            }
+        }
     }
 
     public List<User> findFollowers(long userId) throws Exception {

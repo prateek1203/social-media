@@ -2,6 +2,9 @@ package com.example.socialmedia.web.rest;
 
 import com.example.socialmedia.domain.Post;
 import com.example.socialmedia.domain.User;
+import com.example.socialmedia.exception.GlobalException;
+import com.example.socialmedia.exception.NoNewsFeedException;
+import com.example.socialmedia.exception.UserNotFoundException;
 import com.example.socialmedia.service.PostService;
 import com.example.socialmedia.service.UserService;
 import org.slf4j.Logger;
@@ -32,7 +35,7 @@ public class UserController {
         LOGGER.info(">>>>>> Creating User >>>>>>>>");
         User newUser = userService.createUser(user);
         if (null == newUser) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            throw new GlobalException("User can not be created with emailId: " + user.getEmail() );
         }
         LOGGER.debug("User created: " + newUser);
         return new ResponseEntity<>(newUser, HttpStatus.CREATED);
@@ -44,7 +47,7 @@ public class UserController {
         User existingUser = userService.findUserById(userId);
         if (null == existingUser) {
             LOGGER.debug("User not found with id: " + userId);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            throw new UserNotFoundException("User not found with id: " + userId);
         }
         LOGGER.debug("User found: " + existingUser);
         return new ResponseEntity<>(existingUser, HttpStatus.OK);
@@ -55,7 +58,7 @@ public class UserController {
         LOGGER.info(String.format("/users/%s/feed", userId));
         List<Post> posts = postService.getNewsFeedForUser(userId);
         if (null == posts) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            throw new NoNewsFeedException("Error while finding feed for user " + userId);
         }
         return new ResponseEntity<>(posts, HttpStatus.OK);
     }
@@ -67,7 +70,7 @@ public class UserController {
             userService.followUser(followerId, followeeId);
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            throw new GlobalException("User can not follow itself, Please send diff user ids");
         }
 
     }
@@ -75,11 +78,11 @@ public class UserController {
     @PatchMapping(value = "/{followerId}/unfollows/{followeeId}", produces = "application/json")
     public ResponseEntity<String> unFollowUser(@PathVariable long followerId, @PathVariable long followeeId) {
         LOGGER.info(String.format("/users/%s/unfollows/%s", followerId, followerId));
-        try {
+        if (followerId != followeeId) {
             userService.unFollowUser(followerId, followeeId);
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } else {
+            throw new GlobalException("User can not unfollow itself, Please send diff user id");
         }
     }
 

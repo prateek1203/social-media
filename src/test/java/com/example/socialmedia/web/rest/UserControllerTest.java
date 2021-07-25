@@ -2,12 +2,16 @@ package com.example.socialmedia.web.rest;
 
 import com.example.socialmedia.domain.Post;
 import com.example.socialmedia.domain.User;
+import com.example.socialmedia.exception.GlobalException;
+import com.example.socialmedia.exception.NoNewsFeedException;
+import com.example.socialmedia.exception.UserNotFoundException;
 import com.example.socialmedia.service.PostService;
 import com.example.socialmedia.service.UserService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
@@ -22,6 +26,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.Mockito.*;
 @SpringBootTest
 @RunWith(MockitoJUnitRunner.class)
@@ -80,18 +85,17 @@ public class UserControllerTest {
         assertThat(result).isEqualTo(new ResponseEntity<>(mockUser, HttpStatus.OK));
     }
 
-    @Test
-    public void createUserShouldReturnA400ErrorIfResponseIsNull() {
+    @Test(expected = GlobalException.class)
+    public void createUserShouldReturnA400ErrorIfResponseIsNull() throws GlobalException {
         User user = new User("mockFirstName", "mockLastName", "mockEmail");
         when(mockUserService.createUser(user)).thenReturn(null);
-
         ResponseEntity<User> result = unit.createUser(user);
         assertThat(result).isEqualTo(ResponseEntity.status(HttpStatus.BAD_REQUEST).build());
     }
 
-    @Test
-    public void findUserByIdShouldReturnA400ErrorIfResponseIsNull() {
-        when(mockUserService.findUserById(randomId)).thenReturn(null);
+    @Test(expected = UserNotFoundException.class)
+    public void findUserByIdShouldReturnA400ErrorIfResponseIsNull() throws UserNotFoundException {
+        Mockito.when(mockUserService.findUserById(randomId)).thenReturn(null);
 
         ResponseEntity<User> result = unit.findUserById(randomId);
         assertThat(result).isEqualTo(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
@@ -115,8 +119,8 @@ public class UserControllerTest {
         assertThat(result).isEqualTo(result);
     }
 
-    @Test
-    public void getNewsFeedShouldReturnA400ErrorIfResponseIsNull() {
+    @Test(expected = NoNewsFeedException.class)
+    public void getNewsFeedShouldReturnA400ErrorIfResponseIsNull() throws NoNewsFeedException {
         when(mockPostService.getNewsFeedForUser(randomId)).thenReturn(null);
 
         ResponseEntity<List<Post>> result = unit.getNewsFeed(randomId);

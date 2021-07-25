@@ -2,6 +2,7 @@ package com.example.socialmedia.web.rest;
 
 import com.example.socialmedia.domain.Post;
 import com.example.socialmedia.domain.User;
+import com.example.socialmedia.exception.PostNotCreatedException;
 import com.example.socialmedia.service.PostService;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,6 +19,7 @@ import java.lang.reflect.Method;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
+
 @SpringBootTest
 @RunWith(MockitoJUnitRunner.class)
 public class PostControllerTest {
@@ -43,7 +45,7 @@ public class PostControllerTest {
     }
 
     @Test
-    public void createUserShouldBePostMapping() throws NoSuchMethodException {
+    public void createPostShouldBePostMapping() throws NoSuchMethodException {
         Method findConfigLayerById = unit.getClass().getMethod("createPost", long.class, Post.class);
         PostMapping annotation = findConfigLayerById.getAnnotation(PostMapping.class);
         assertThat(annotation).isNotNull();
@@ -53,14 +55,14 @@ public class PostControllerTest {
     }
 
     @Test
-    public void createUserShouldReturnAResponseEntity() {
-        when(mockPostService.createPost(rnadomUserId,mockPost)).thenReturn(mockPost);
+    public void createPostShouldReturnAResponseEntity() {
+        when(mockPostService.createPost(rnadomUserId, mockPost)).thenReturn(mockPost);
         ResponseEntity<Post> result = unit.createPost(rnadomUserId, mockPost);
         assertThat(result).isEqualTo(result);
     }
 
-    @Test
-    public void createUserShouldReturnA400ErrorIfResponseIsNull() {
+    @Test(expected = PostNotCreatedException.class)
+    public void createUserShouldReturnA400ErrorIfResponseIsNull() throws PostNotCreatedException {
         Post post = new Post(mockUser, "Testing post content");
         when(mockPostService.createPost(rnadomUserId, post)).thenReturn(null);
 

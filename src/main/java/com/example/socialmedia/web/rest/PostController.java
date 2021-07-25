@@ -1,6 +1,8 @@
 package com.example.socialmedia.web.rest;
 
 import com.example.socialmedia.domain.Post;
+import com.example.socialmedia.exception.PostNotCreatedException;
+import com.example.socialmedia.exception.UserNotFoundException;
 import com.example.socialmedia.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,7 +23,7 @@ public class PostController {
     public ResponseEntity<Post> createPost(@PathVariable long userId, @RequestBody Post newPost) {
         Post post = postService.createPost(userId, newPost);
         if( null == post){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            throw new PostNotCreatedException("Post can not be created for user " + userId);
         }
         return new ResponseEntity<>(post, HttpStatus.CREATED);
     }

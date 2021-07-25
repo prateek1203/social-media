@@ -35,8 +35,7 @@ public class User extends AbstractEntity {
     @ManyToMany
     @JoinTable(
             name = "users_follower",
-            joinColumns = @JoinColumn(name = "follower_id"),
-            inverseJoinColumns = @JoinColumn(name = "followee_id")
+            joinColumns = @JoinColumn(name = "follower_id")
     )
     private final List<User> following = new ArrayList<>();
 
