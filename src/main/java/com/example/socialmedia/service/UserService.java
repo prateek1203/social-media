@@ -1,6 +1,7 @@
 package com.example.socialmedia.service;
 
 import com.example.socialmedia.domain.User;
+import com.example.socialmedia.exception.UserNotFoundException;
 import com.example.socialmedia.repository.UserRepository;
 import com.sun.istack.NotNull;
 import org.slf4j.Logger;
@@ -43,7 +44,7 @@ public class UserService {
         return user;
     }
 
-    public void followUser(long followerId, long followeeId) {
+    public void followUser(long followerId, long followeeId) throws UserNotFoundException {
         User follower = userRepository.findById(followerId).orElse(null);
         User followee = userRepository.findById(followeeId).orElse(null);
         if (null != follower && null != followee){
@@ -51,10 +52,12 @@ public class UserService {
                 follower.getFollowing().add(followee);
                 userRepository.saveAndFlush(follower);
             }
+        } else {
+            throw new UserNotFoundException("User unknown");
         }
     }
 
-    public void unFollowUser(long followerId, long followeeId) {
+    public void unFollowUser(long followerId, long followeeId) throws UserNotFoundException {
         User follower = userRepository.findById(followerId).orElse(null);
         User followee = userRepository.findById(followeeId).orElse(null);
         if (null != follower && null != followee){
@@ -62,6 +65,8 @@ public class UserService {
                 follower.getFollowing().remove(followee);
                 userRepository.saveAndFlush(follower);
             }
+        } else {
+            throw new UserNotFoundException("User unknown");
         }
     }
 
