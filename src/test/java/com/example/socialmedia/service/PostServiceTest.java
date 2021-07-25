@@ -2,6 +2,7 @@ package com.example.socialmedia.service;
 
 import com.example.socialmedia.domain.Post;
 import com.example.socialmedia.domain.User;
+import com.example.socialmedia.exception.UserNotFoundException;
 import com.example.socialmedia.repository.PostRepository;
 import com.example.socialmedia.repository.UserRepository;
 import org.junit.Assert;
@@ -43,8 +44,8 @@ public class PostServiceTest {
         Assert.assertEquals(actualPost, mockPost);
     }
 
-    @Test
-    public void shouldReturnNullForCreateUserIfUserDoesNotExist() {
+    @Test(expected = UserNotFoundException.class)
+    public void shouldReturnNullForCreateUserIfUserDoesNotExist() throws UserNotFoundException {
         User user = new User("mockFirstName", "mockLatName", "mockEmail");
         Post post = new Post(user, "content");
         when(mockUserRepository.findById(randomUserId)).thenReturn(Optional.empty());

@@ -2,6 +2,7 @@ package com.example.socialmedia.service;
 
 import com.example.socialmedia.domain.Post;
 import com.example.socialmedia.domain.User;
+import com.example.socialmedia.exception.UserNotFoundException;
 import com.example.socialmedia.repository.PostRepository;
 import com.example.socialmedia.repository.UserRepository;
 import org.slf4j.Logger;
@@ -27,14 +28,15 @@ public class PostService {
     }
 
     @Transactional
-    public Post createPost(long userId, final Post post) {
+    public Post createPost(long userId, final Post post) throws UserNotFoundException {
         LOGGER.info("creating post for user: " + userId);
         User user = userRepository.findById(userId).orElse(null);
         if (null != user){
             post.setUser(user);
             return postRepository.save(post);
+        } else {
+            throw new UserNotFoundException("User does not exist. Post can not be created");
         }
-        return null;
     }
 
     public List<Post> getNewsFeedForUser(long userId) {

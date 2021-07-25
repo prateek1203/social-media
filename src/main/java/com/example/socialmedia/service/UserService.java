@@ -1,6 +1,7 @@
 package com.example.socialmedia.service;
 
 import com.example.socialmedia.domain.User;
+import com.example.socialmedia.exception.GlobalException;
 import com.example.socialmedia.exception.UserNotFoundException;
 import com.example.socialmedia.repository.UserRepository;
 import com.sun.istack.NotNull;
@@ -44,26 +45,30 @@ public class UserService {
         return user;
     }
 
-    public void followUser(long followerId, long followeeId) throws UserNotFoundException {
+    public void followUser(long followerId, long followeeId) throws GlobalException  {
         User follower = userRepository.findById(followerId).orElse(null);
         User followee = userRepository.findById(followeeId).orElse(null);
         if (null != follower && null != followee){
             if (!follower.getFollowing().contains(followee)) {
                 follower.getFollowing().add(followee);
                 userRepository.saveAndFlush(follower);
+            }else {
+                throw new GlobalException("User already follows this user.");
             }
         } else {
             throw new UserNotFoundException("User unknown");
         }
     }
 
-    public void unFollowUser(long followerId, long followeeId) throws UserNotFoundException {
+    public void unFollowUser(long followerId, long followeeId) throws GlobalException {
         User follower = userRepository.findById(followerId).orElse(null);
         User followee = userRepository.findById(followeeId).orElse(null);
         if (null != follower && null != followee){
             if (follower.getFollowing().contains(followee)) {
                 follower.getFollowing().remove(followee);
                 userRepository.saveAndFlush(follower);
+            }else {
+                throw new GlobalException("User does not follow this user.");
             }
         } else {
             throw new UserNotFoundException("User unknown");
