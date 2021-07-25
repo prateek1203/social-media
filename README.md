@@ -1,4 +1,4 @@
-                                                                  SocialMedia
+                           SocialMedia
 
 This service allows user to see news feed of its own as well as own followings.
 In order to run this server first run below command
