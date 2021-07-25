@@ -2,6 +2,7 @@ package com.example.socialmedia.service;
 
 import com.example.socialmedia.domain.User;
 import com.example.socialmedia.exception.GlobalException;
+import com.example.socialmedia.exception.UserAlreadyExistException;
 import com.example.socialmedia.exception.UserNotFoundException;
 import com.example.socialmedia.repository.UserRepository;
 import com.sun.istack.NotNull;
@@ -26,12 +27,12 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public User createUser(User user) throws GlobalException {
+    public User createUser(User user) throws UserAlreadyExistException {
         LOGGER.info("Creating user with details :- " + user);
         Optional<User> existingUser = userRepository.findUserByEmail(user.getEmail());
         if (existingUser.isPresent()) {
             LOGGER.debug(String.format("User already exists with email id %s ", user.getEmail()));
-            throw new GlobalException("User already exits.Can not create.");
+            throw new UserAlreadyExistException("User already exits.Can not create.");
         }
         return userRepository.saveAndFlush(user);
     }

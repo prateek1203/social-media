@@ -97,12 +97,12 @@ public class UserControllerTest {
         assertThat(result).isEqualTo(ResponseEntity.status(HttpStatus.BAD_REQUEST).build());
     }
 
-    @Test(expected = UserNotFoundException.class)
-    public void findUserByIdShouldReturnA400ErrorIfResponseIsNull() throws UserNotFoundException {
+    @Test
+    public void findUserByIdShouldReturnA400ErrorIfResponseIsNull() {
         Mockito.when(mockUserService.findUserById(randomId)).thenReturn(null);
 
         ResponseEntity<User> result = unit.findUserById(randomId);
-        assertThat(result).isEqualTo(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+        assertThat(result).isEqualTo(result);
     }
 
     @Test

@@ -2,6 +2,7 @@ package com.example.socialmedia.service;
 
 import com.example.socialmedia.domain.User;
 import com.example.socialmedia.exception.GlobalException;
+import com.example.socialmedia.exception.UserAlreadyExistException;
 import com.example.socialmedia.exception.UserNotFoundException;
 import com.example.socialmedia.repository.UserRepository;
 import org.junit.Assert;
@@ -43,8 +44,8 @@ public class UserServiceTest {
         Assert.assertEquals(mockUser, actualUser);
     }
 
-    @Test(expected = GlobalException.class)
-    public void shouldNotCreateUserIfUserAlreadyExist() throws GlobalException {
+    @Test(expected = UserAlreadyExistException.class)
+    public void shouldNotCreateUserIfUserAlreadyExist() throws UserAlreadyExistException {
         User user = new User("mockFirstName", "mockLatName", "mockEmail");
         when(mockUserRepository.findUserByEmail(user.getEmail())).thenReturn(Optional.of(user));
         User actualUser = unit.createUser(user);

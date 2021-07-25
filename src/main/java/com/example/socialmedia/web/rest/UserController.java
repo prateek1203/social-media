@@ -4,6 +4,7 @@ import com.example.socialmedia.domain.Post;
 import com.example.socialmedia.domain.User;
 import com.example.socialmedia.exception.GlobalException;
 import com.example.socialmedia.exception.NoNewsFeedException;
+import com.example.socialmedia.exception.UserAlreadyExistException;
 import com.example.socialmedia.exception.UserNotFoundException;
 import com.example.socialmedia.service.PostService;
 import com.example.socialmedia.service.UserService;
@@ -31,7 +32,7 @@ public class UserController {
     }
 
     @PostMapping(produces = "application/json")
-    public ResponseEntity<User> createUser(@RequestBody final User user) throws GlobalException {
+    public ResponseEntity<User> createUser(@RequestBody final User user) throws UserAlreadyExistException {
         LOGGER.info(">>>>>> Creating User >>>>>>>>");
         User newUser = userService.createUser(user);
         if (null == newUser) {
@@ -45,16 +46,11 @@ public class UserController {
     public ResponseEntity<User> findUserById(@PathVariable long userId) {
         LOGGER.info(String.format("/users/%s", userId));
         User existingUser = userService.findUserById(userId);
-        if (null == existingUser) {
-            LOGGER.debug("User not found with id: " + userId);
-            throw new UserNotFoundException("User not found with id: " + userId);
-        }
-        LOGGER.debug("User found: " + existingUser);
         return new ResponseEntity<>(existingUser, HttpStatus.OK);
     }
 
     @GetMapping(value = "/{userId}/feeds", produces = "application/json")
-    public ResponseEntity<List<Post>> getNewsFeed(@PathVariable long userId) {
+    public ResponseEntity<List<Post>> getNewsFeed(@PathVariable long userId) throws GlobalException {
         LOGGER.info(String.format("/users/%s/feed", userId));
         List<Post> posts = postService.getNewsFeedForUser(userId);
         if (null == posts) {

@@ -35,16 +35,14 @@ public class PostService {
         return postRepository.save(post);
     }
 
-    public List<Post> getNewsFeedForUser(long userId) {
-        User user = userRepository.findById(userId).orElse(null);
-        if (null != user){
-            List<Long> ids = user.getFollowing().stream().map(User::getId).collect(Collectors.toList());
-            List<Post> posts =  findAllPostsOfFollowings(ids);
-            posts.addAll(user.getPosts()); // include own posts also
-            posts.sort((o1, o2) -> - Long.compare(o1.getCreatedAt().getTime(), o2.getCreatedAt().getTime()));
-            return posts;
-        }
-        return null;
+    public List<Post> getNewsFeedForUser(long userId) throws UserNotFoundException {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User does not exist. Post can not be seen."));
+        List<Long> ids = user.getFollowing().stream().map(User::getId).collect(Collectors.toList());
+        List<Post> posts =  findAllPostsOfFollowings(ids);
+        posts.addAll(user.getPosts()); // include own posts also
+        posts.sort((o1, o2) -> - Long.compare(o1.getCreatedAt().getTime(), o2.getCreatedAt().getTime()));
+        return posts;
     }
 
     private List<Post> findAllPostsOfFollowings(List<Long> ids) {
