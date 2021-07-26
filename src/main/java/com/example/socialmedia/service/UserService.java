@@ -2,10 +2,12 @@ package com.example.socialmedia.service;
 
 import com.example.socialmedia.domain.User;
 import com.example.socialmedia.exception.GlobalException;
+import com.example.socialmedia.exception.RequiredParameterMissingException;
 import com.example.socialmedia.exception.UserAlreadyExistException;
 import com.example.socialmedia.exception.UserNotFoundException;
 import com.example.socialmedia.repository.UserRepository;
 import com.sun.istack.NotNull;
+import org.apache.logging.log4j.util.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,8 +29,11 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public User createUser(User user) throws UserAlreadyExistException {
+    public User createUser(User user) throws GlobalException {
         LOGGER.info("Creating user with details :- " + user);
+        if (Strings.isBlank(user.getEmail())){
+            throw new RequiredParameterMissingException("Missing required parameter: EMAIL-ID");
+        }
         Optional<User> existingUser = userRepository.findUserByEmail(user.getEmail());
         if (existingUser.isPresent()) {
             LOGGER.debug(String.format("User already exists with email id %s ", user.getEmail()));

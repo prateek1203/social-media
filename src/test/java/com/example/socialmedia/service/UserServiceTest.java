@@ -44,8 +44,8 @@ public class UserServiceTest {
         Assert.assertEquals(mockUser, actualUser);
     }
 
-    @Test(expected = UserAlreadyExistException.class)
-    public void shouldNotCreateUserIfUserAlreadyExist() throws UserAlreadyExistException {
+    @Test(expected = GlobalException.class)
+    public void shouldNotCreateUserIfUserAlreadyExist() throws GlobalException {
         User user = new User("mockFirstName", "mockLatName", "mockEmail");
         when(mockUserRepository.findUserByEmail(user.getEmail())).thenReturn(Optional.of(user));
         User actualUser = unit.createUser(user);

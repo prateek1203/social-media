@@ -41,5 +41,13 @@ public class GlobalExceptionHandler {
         ErrorResponse error = new ErrorResponse("SERVER ERROR", details);
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler({RequiredParameterMissingException.class})
+    public ResponseEntity<ErrorResponse> handleException(RequiredParameterMissingException exception) {
+        Map<String, String> details = new HashMap<>();
+        details.put("error",exception.getMessage());
+        ErrorResponse error = new ErrorResponse("SERVER ERROR", details);
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
 }
 

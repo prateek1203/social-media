@@ -2,9 +2,12 @@ package com.example.socialmedia.service;
 
 import com.example.socialmedia.domain.Post;
 import com.example.socialmedia.domain.User;
+import com.example.socialmedia.exception.GlobalException;
+import com.example.socialmedia.exception.RequiredParameterMissingException;
 import com.example.socialmedia.exception.UserNotFoundException;
 import com.example.socialmedia.repository.PostRepository;
 import com.example.socialmedia.repository.UserRepository;
+import org.apache.logging.log4j.util.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,8 +31,11 @@ public class PostService {
     }
 
     @Transactional
-    public Post createPost(long userId, final Post post) throws UserNotFoundException {
+    public Post createPost(long userId, final Post post) throws GlobalException {
         LOGGER.info("creating post for user: " + userId);
+        if (Strings.isBlank(post.getContent())){
+            throw new RequiredParameterMissingException("Missing required parameter: POST-CONTENT");
+        }
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User does not exist. Post can not be created"));
         post.setUser(user);
         return postRepository.save(post);

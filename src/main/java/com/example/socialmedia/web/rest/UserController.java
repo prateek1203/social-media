@@ -8,6 +8,7 @@ import com.example.socialmedia.exception.UserAlreadyExistException;
 import com.example.socialmedia.exception.UserNotFoundException;
 import com.example.socialmedia.service.PostService;
 import com.example.socialmedia.service.UserService;
+import com.sun.istack.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +33,7 @@ public class UserController {
     }
 
     @PostMapping(produces = "application/json")
-    public ResponseEntity<User> createUser(@RequestBody final User user) throws UserAlreadyExistException {
+    public ResponseEntity<User> createUser(@RequestBody @NotNull final User user) throws UserAlreadyExistException {
         LOGGER.info(">>>>>> Creating User >>>>>>>>");
         User newUser = userService.createUser(user);
         if (null == newUser) {
