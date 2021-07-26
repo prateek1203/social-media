@@ -5,7 +5,7 @@ In order to run this server first run below command
 
 Java Version Used: **JDK 11**
             
-    mvn clean install -u
+    mvn clean install -U
 
 service will be up at port **9002**
 
